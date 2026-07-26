@@ -3,6 +3,9 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import type { RouteDto, StopDto, KnowledgeEntryDto } from '../types';
 import { KnowledgeEntryCard } from '../components/KnowledgeEntryCard';
+import { AddStopForm } from '../components/AddStopForm';
+import { AddKnowledgeEntryForm } from '../components/AddKnowledgeEntryForm';
+import { secondaryButtonClass } from '../components/formStyles';
 
 export function RouteDetailPage() {
   const { routeId } = useParams<{ routeId: string }>();
@@ -12,6 +15,9 @@ export function RouteDetailPage() {
   const [stops, setStops] = useState<StopDto[]>([]);
   const [routeNotes, setRouteNotes] = useState<KnowledgeEntryDto[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const [showAddStop, setShowAddStop] = useState(false);
+  const [showAddNote, setShowAddNote] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -35,6 +41,9 @@ export function RouteDetailPage() {
     return <p className="text-[var(--ink-muted)]">Loading route...</p>;
   }
 
+  const nextSequenceOrder =
+    stops.length === 0 ? 1 : Math.max(...stops.map((s) => s.sequenceOrder)) + 1;
+
   return (
     <div>
       <Link to="/" className="mb-4 inline-block text-sm text-[var(--navy)] hover:underline">
@@ -45,19 +54,61 @@ export function RouteDetailPage() {
         <p className="mt-1 text-[var(--ink-muted)]">{route.description}</p>
       )}
 
-      {routeNotes.length > 0 && (
-        <section className="mt-8">
-          <h2 className="mb-3 text-lg">Route-wide notes</h2>
+      <section className="mt-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg">Route-wide notes</h2>
+          {!showAddNote && (
+            <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
+              + Add note
+            </button>
+          )}
+        </div>
+
+        {showAddNote && (
+          <AddKnowledgeEntryForm
+            target={{ type: 'route', id }}
+            onCreated={(entry) => {
+              setRouteNotes((prev) => [...prev, entry]);
+              setShowAddNote(false);
+            }}
+            onCancel={() => setShowAddNote(false)}
+          />
+        )}
+
+        {routeNotes.length > 0 && (
           <div className="grid gap-3">
             {routeNotes.map((entry) => (
               <KnowledgeEntryCard key={entry.id} entry={entry} />
             ))}
           </div>
-        </section>
-      )}
+        )}
+        {routeNotes.length === 0 && !showAddNote && (
+          <p className="text-sm text-[var(--ink-muted)]">No route-wide notes yet.</p>
+        )}
+      </section>
 
       <section className="mt-8">
-        <h2 className="mb-3 text-lg">Stops</h2>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-lg">Stops</h2>
+          {!showAddStop && (
+            <button className={secondaryButtonClass} onClick={() => setShowAddStop(true)}>
+              + Add stop
+            </button>
+          )}
+        </div>
+
+        {showAddStop && (
+          <AddStopForm
+            routeId={id}
+            nextSequenceOrder={nextSequenceOrder}
+            onCreated={(stop) => {
+              setStops((prev) => [...prev, stop]);
+              setShowAddStop(false);
+            }}
+            onCancel={() => setShowAddStop(false)}
+          />
+        )}
+
         {stops.length === 0 ? (
           <p className="text-[var(--ink-muted)]">No stops on this route yet.</p>
         ) : (

@@ -32,7 +32,15 @@ export function RouteListPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl">Routes</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl">Routes</h1>
+        <Link
+          to="/routes/new"
+          className="rounded bg-[var(--navy)] px-3 py-1.5 text-sm text-white hover:bg-[var(--navy-dark)]"
+        >
+          + New Route
+        </Link>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {routes.map((route) => (
           <Link

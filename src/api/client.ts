@@ -4,6 +4,7 @@ import type {
   StopDto,
   KnowledgeEntryDto,
   AttachmentDto,
+  LocationDto,
   ErrorResponse,
 } from '../types';
 
@@ -53,6 +54,12 @@ export const api = {
     getById: (id: number) => request<DriverDto>(`/api/drivers/${id}`),
     create: (data: Omit<DriverDto, 'id'>) =>
       request<DriverDto>('/api/drivers', { method: 'POST', body: JSON.stringify(data) }),
+  },
+
+  locations: {
+    getAll: () => request<LocationDto[]>('/api/locations'),
+    create: (data: Omit<LocationDto, 'id'>) =>
+      request<LocationDto>('/api/locations', { method: 'POST', body: JSON.stringify(data) }),
   },
 
   routes: {

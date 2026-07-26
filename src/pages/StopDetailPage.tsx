@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import type { KnowledgeEntryDto } from '../types';
 import { KnowledgeEntryCard } from '../components/KnowledgeEntryCard';
+import { AddKnowledgeEntryForm } from '../components/AddKnowledgeEntryForm';
+import { secondaryButtonClass } from '../components/formStyles';
 
 export function StopDetailPage() {
   const { stopId } = useParams<{ stopId: string }>();
@@ -10,6 +12,7 @@ export function StopDetailPage() {
 
   const [entries, setEntries] = useState<KnowledgeEntryDto[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showAddNote, setShowAddNote] = useState(false);
 
   useEffect(() => {
     api.knowledgeEntries
@@ -28,8 +31,27 @@ export function StopDetailPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl">Stop Notes</h1>
-      {entries.length === 0 ? (
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl">Stop Notes</h1>
+        {!showAddNote && (
+          <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
+            + Add note
+          </button>
+        )}
+      </div>
+
+      {showAddNote && (
+        <AddKnowledgeEntryForm
+          target={{ type: 'stop', id }}
+          onCreated={(entry) => {
+            setEntries((prev) => [...(prev ?? []), entry]);
+            setShowAddNote(false);
+          }}
+          onCancel={() => setShowAddNote(false)}
+        />
+      )}
+
+      {entries.length === 0 && !showAddNote ? (
         <p className="text-[var(--ink-muted)]">No knowledge entries for this stop yet.</p>
       ) : (
         <div className="grid gap-3">

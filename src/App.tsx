@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { RouteListPage } from './pages/RouteListPage';
+import { CreateRoutePage } from './pages/CreateRoutePage';
 import { RouteDetailPage } from './pages/RouteDetailPage';
 import { StopDetailPage } from './pages/StopDetailPage';
 import { KnowledgeEntryDetailPage } from './pages/KnowledgeEntryDetailPage';
@@ -12,6 +13,7 @@ export default function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<RouteListPage />} />
+          <Route path="/routes/new" element={<CreateRoutePage />} />
           <Route path="/routes/:routeId" element={<RouteDetailPage />} />
           <Route path="/stops/:stopId" element={<StopDetailPage />} />
           <Route path="/knowledge-entries/:entryId" element={<KnowledgeEntryDetailPage />} />
