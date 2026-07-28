@@ -25,8 +25,13 @@ export class ApiError extends Error {
   }
 }
 
+// In production, VITE_API_BASE_URL is set at build time to the deployed
+// backend's URL. Left unset for local dev, so requests stay relative and
+// go through Vite's dev-server proxy to localhost:8080 (see vite.config.ts).
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
+  const response = await fetch(`${API_BASE}${path}`, {
     headers: options?.body instanceof FormData
       ? undefined
       : { 'Content-Type': 'application/json' },
