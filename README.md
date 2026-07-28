@@ -1,75 +1,35 @@
-# React + TypeScript + Vite
+# RouteBook Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The React frontend for RouteBook — a route-knowledge management tool for Cintas SSR routes. Talks to the [RouteBook backend](../RouteBook) (Spring Boot REST API).
 
-Currently, two official plugins are available:
+## Tech stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 18 + TypeScript
+- Vite (build tool, dev server with API proxy)
+- Tailwind CSS v4
+- React Router v7
 
-## React Compiler
+## Design direction
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm paper-toned background, condensed industrial headings (Oswald), monospace treatment for gate codes and data (IBM Plex Mono), and a signature element: knowledge-entry cards styled like index cards with a die-cut colored tab on the left edge, color-coded by category (hazard = burnt orange, gate code = navy, parking = sage, contact = purple, access = tan, other = gray).
 
-## Expanding the ESLint configuration
+## Core features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Route-first browsing** — route list → route detail (stops + route-wide notes) → stop detail (stop-specific notes) → knowledge entry detail (with attachments)
+- **Search** — a persistent header search box filtering across all knowledge entries by title/body text
+- **Create/edit forms** — new routes (with inline new-driver creation), new stops (creates the underlying Location and Stop in one submit), and new knowledge entries at both the route and stop level
+- **File attachments** — upload/view/delete files on any knowledge entry, backed by Cloudflare R2 via the backend
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Documentation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [SETUP.md](SETUP.md) — running the dev server, connecting to the backend
+- [ARCHITECTURE.md](ARCHITECTURE.md) — component structure, API client, design system
+- [USER_GUIDE.md](USER_GUIDE.md) — walkthrough for end users (SSRs)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project status
 
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+| Phase | Scope | Status |
+|---|---|---|
+| 5 | Scaffold, routing, API client, all core read pages | Done |
+| 6 | Create/edit forms | Done |
+| 7 | Documentation, GitHub publish | In progress |
