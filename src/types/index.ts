@@ -25,6 +25,17 @@ export interface RouteDto {
   driverId: number | null;
 }
 
+export interface LocationDto {
+  id: number;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  state: string;
+  zipCode: string;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 export interface StopDto {
   id: number;
   customerName: string;
