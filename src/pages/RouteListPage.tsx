@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import type { RouteDto } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 export function RouteListPage() {
+  const { loggedIn } = useAuth();
   const [routes, setRoutes] = useState<RouteDto[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,39 +24,42 @@ export function RouteListPage() {
     return <p className="text-[var(--ink-muted)]">Loading routes...</p>;
   }
 
-  if (routes.length === 0) {
-    return (
-      <div className="rounded-md border border-dashed border-[var(--border)] p-8 text-center text-[var(--ink-muted)]">
-        No routes yet. Routes are created from the backend for now.
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl">Routes</h1>
-        <Link
-          to="/routes/new"
-          className="rounded bg-[var(--navy)] px-3 py-1.5 text-sm text-white hover:bg-[var(--navy-dark)]"
-        >
-          + New Route
-        </Link>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {routes.map((route) => (
+        {loggedIn ? (
           <Link
-            key={route.id}
-            to={`/routes/${route.id}`}
-            className="rounded-md border border-[var(--border)] bg-white p-5 shadow-sm transition hover:shadow-md"
+            to="/routes/new"
+            className="rounded bg-[var(--navy)] px-3 py-1.5 text-sm text-white hover:bg-[var(--navy-dark)]"
           >
-            <h2 className="text-lg text-[var(--ink)]">{route.name}</h2>
-            {route.description && (
-              <p className="mt-1 text-sm text-[var(--ink-muted)]">{route.description}</p>
-            )}
+            + New Route
           </Link>
-        ))}
+        ) : (
+          <span className="text-sm text-[var(--ink-muted)]">Log in to add a route</span>
+        )}
       </div>
+
+      {routes.length === 0 ? (
+        <div className="rounded-md border border-dashed border-[var(--border)] p-8 text-center text-[var(--ink-muted)]">
+          No routes yet.
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {routes.map((route) => (
+            <Link
+              key={route.id}
+              to={`/routes/${route.id}`}
+              className="rounded-md border border-[var(--border)] bg-white p-5 shadow-sm transition hover:shadow-md"
+            >
+              <h2 className="text-lg text-[var(--ink)]">{route.name}</h2>
+              {route.description && (
+                <p className="mt-1 text-sm text-[var(--ink-muted)]">{route.description}</p>
+              )}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

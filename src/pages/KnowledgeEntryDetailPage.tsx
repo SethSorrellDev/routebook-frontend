@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api/client';
 import type { KnowledgeEntryDto, AttachmentDto } from '../types';
 import { CATEGORY_STYLES } from '../components/categoryStyles';
+import { useAuth } from '../context/AuthContext';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -11,6 +12,7 @@ function formatFileSize(bytes: number): string {
 }
 
 export function KnowledgeEntryDetailPage() {
+  const { loggedIn } = useAuth();
   const { entryId } = useParams<{ entryId: string }>();
   const id = Number(entryId);
 
@@ -47,9 +49,6 @@ export function KnowledgeEntryDetailPage() {
       await api.attachments.upload(id, file);
       loadAttachments();
     } catch (err) {
-      // Note: until Cloudflare R2 credentials are configured on the
-      // backend, uploads will fail here even for valid files - that's
-      // expected during local dev before Phase 4's R2 setup is complete.
       setUploadError(err instanceof ApiError ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
@@ -102,16 +101,20 @@ export function KnowledgeEntryDetailPage() {
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg">Attachments</h2>
-          <label className="cursor-pointer rounded bg-[var(--navy)] px-3 py-1.5 text-sm text-white hover:bg-[var(--navy-dark)]">
-            {uploading ? 'Uploading...' : 'Add file'}
-            <input
-              ref={fileInputRef}
-              type="file"
-              className="hidden"
-              onChange={handleFileSelect}
-              disabled={uploading}
-            />
-          </label>
+          {loggedIn ? (
+            <label className="cursor-pointer rounded bg-[var(--navy)] px-3 py-1.5 text-sm text-white hover:bg-[var(--navy-dark)]">
+              {uploading ? 'Uploading...' : 'Add file'}
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileSelect}
+                disabled={uploading}
+              />
+            </label>
+          ) : (
+            <span className="text-sm text-[var(--ink-muted)]">Log in to add files</span>
+          )}
         </div>
 
         {uploadError && (
@@ -136,12 +139,14 @@ export function KnowledgeEntryDetailPage() {
                   <span className="font-mono text-xs text-[var(--ink-muted)]">
                     {formatFileSize(att.fileSizeBytes)}
                   </span>
-                  <button
-                    onClick={() => handleDelete(att.id)}
-                    className="text-xs text-[var(--hazard)] hover:underline"
-                  >
-                    Remove
-                  </button>
+                  {loggedIn && (
+                    <button
+                      onClick={() => handleDelete(att.id)}
+                      className="text-xs text-[var(--hazard)] hover:underline"
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               </li>
             ))}

@@ -7,6 +7,7 @@ import type {
   LocationDto,
   ErrorResponse,
 } from '../types';
+import { getAuthHeader } from './auth';
 
 /**
  * Thrown for any non-2xx response. Carries the backend's ErrorResponse
@@ -31,10 +32,16 @@ export class ApiError extends Error {
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const authHeader = getAuthHeader();
+  const baseHeaders: Record<string, string> = options?.body instanceof FormData
+    ? {}
+    : { 'Content-Type': 'application/json' };
+  if (authHeader) {
+    baseHeaders['Authorization'] = authHeader;
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
-    headers: options?.body instanceof FormData
-      ? undefined
-      : { 'Content-Type': 'application/json' },
+    headers: baseHeaders,
     ...options,
   });
 
@@ -59,6 +66,10 @@ export const api = {
     getById: (id: number) => request<DriverDto>(`/api/drivers/${id}`),
     create: (data: Omit<DriverDto, 'id'>) =>
       request<DriverDto>('/api/drivers', { method: 'POST', body: JSON.stringify(data) }),
+  },
+
+  auth: {
+    verify: () => request<{ username: string }>('/api/auth/verify', { method: 'POST' }),
   },
 
   locations: {

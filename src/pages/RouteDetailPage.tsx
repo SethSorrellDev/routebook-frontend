@@ -6,8 +6,10 @@ import { KnowledgeEntryCard } from '../components/KnowledgeEntryCard';
 import { AddStopForm } from '../components/AddStopForm';
 import { AddKnowledgeEntryForm } from '../components/AddKnowledgeEntryForm';
 import { secondaryButtonClass } from '../components/formStyles';
+import { useAuth } from '../context/AuthContext';
 
 export function RouteDetailPage() {
+  const { loggedIn } = useAuth();
   const { routeId } = useParams<{ routeId: string }>();
   const id = Number(routeId);
 
@@ -57,14 +59,18 @@ export function RouteDetailPage() {
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg">Route-wide notes</h2>
-          {!showAddNote && (
-            <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
-              + Add note
-            </button>
+          {loggedIn ? (
+            !showAddNote && (
+              <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
+                + Add note
+              </button>
+            )
+          ) : (
+            <span className="text-xs text-[var(--ink-muted)]">Log in to add notes</span>
           )}
         </div>
 
-        {showAddNote && (
+        {loggedIn && showAddNote && (
           <AddKnowledgeEntryForm
             target={{ type: 'route', id }}
             onCreated={(entry) => {
@@ -90,14 +96,18 @@ export function RouteDetailPage() {
       <section className="mt-8">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg">Stops</h2>
-          {!showAddStop && (
-            <button className={secondaryButtonClass} onClick={() => setShowAddStop(true)}>
-              + Add stop
-            </button>
+          {loggedIn ? (
+            !showAddStop && (
+              <button className={secondaryButtonClass} onClick={() => setShowAddStop(true)}>
+                + Add stop
+              </button>
+            )
+          ) : (
+            <span className="text-xs text-[var(--ink-muted)]">Log in to add stops</span>
           )}
         </div>
 
-        {showAddStop && (
+        {loggedIn && showAddStop && (
           <AddStopForm
             routeId={id}
             nextSequenceOrder={nextSequenceOrder}

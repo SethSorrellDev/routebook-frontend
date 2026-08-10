@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { LoginControl } from './LoginControl';
 
 /**
  * Top bar carries the route-browsing entry point (logo -> route list)
@@ -34,6 +35,7 @@ export function Layout() {
               className="w-full max-w-md rounded border border-[var(--navy-dark)] bg-white/95 px-3 py-1.5 text-sm text-[var(--ink)] placeholder:text-[var(--ink-muted)] focus:outline-none focus:ring-2 focus:ring-white/50"
             />
           </form>
+          <LoginControl />
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-8">

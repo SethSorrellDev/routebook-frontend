@@ -5,8 +5,10 @@ import type { KnowledgeEntryDto } from '../types';
 import { KnowledgeEntryCard } from '../components/KnowledgeEntryCard';
 import { AddKnowledgeEntryForm } from '../components/AddKnowledgeEntryForm';
 import { secondaryButtonClass } from '../components/formStyles';
+import { useAuth } from '../context/AuthContext';
 
 export function StopDetailPage() {
+  const { loggedIn } = useAuth();
   const { stopId } = useParams<{ stopId: string }>();
   const id = Number(stopId);
 
@@ -33,14 +35,18 @@ export function StopDetailPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl">Stop Notes</h1>
-        {!showAddNote && (
-          <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
-            + Add note
-          </button>
+        {loggedIn ? (
+          !showAddNote && (
+            <button className={secondaryButtonClass} onClick={() => setShowAddNote(true)}>
+              + Add note
+            </button>
+          )
+        ) : (
+          <span className="text-sm text-[var(--ink-muted)]">Log in to add notes</span>
         )}
       </div>
 
-      {showAddNote && (
+      {loggedIn && showAddNote && (
         <AddKnowledgeEntryForm
           target={{ type: 'stop', id }}
           onCreated={(entry) => {
