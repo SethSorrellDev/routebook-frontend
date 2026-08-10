@@ -10,9 +10,11 @@ import {
 } from './formStyles';
 
 /**
- * Creates a Location and a Stop in sequence - the backend has no way to
- * create a Stop without an existing Location, so this form collects both
- * sets of fields and chains the two API calls on submit.
+ * Creates the Location and Stop in a single API call - the backend
+ * wraps both writes in one @Transactional method, so a failure partway
+ * through (e.g. a network drop, a validation error) can no longer leave
+ * an orphaned Location behind, which was possible when this was two
+ * separate sequential requests.
  */
 export function AddStopForm({
   routeId,
@@ -38,22 +40,19 @@ export function AddStopForm({
     setSubmitting(true);
     setError(null);
     try {
-      const location = await api.locations.create({
-        addressLine1,
-        addressLine2: null,
-        city,
-        state,
-        zipCode,
-        latitude: null,
-        longitude: null,
-      });
-
       const stop = await api.stops.create(routeId, {
         customerName,
         sequenceOrder: nextSequenceOrder,
-        locationId: location.id,
+        location: {
+          addressLine1,
+          addressLine2: null,
+          city,
+          state,
+          zipCode,
+          latitude: null,
+          longitude: null,
+        },
       });
-
       onCreated(stop);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Failed to create stop');

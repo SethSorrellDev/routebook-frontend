@@ -90,7 +90,10 @@ export const api = {
 
   stops: {
     getAllForRoute: (routeId: number) => request<StopDto[]>(`/api/routes/${routeId}/stops`),
-    create: (routeId: number, data: Omit<StopDto, 'id' | 'routeId'>) =>
+    // customerName/sequenceOrder plus a full location object (no id) -
+    // the backend creates both the Location and the Stop in one atomic
+    // transaction, so there's no way to end up with an orphaned Location.
+    create: (routeId: number, data: { customerName: string; sequenceOrder: number; location: Omit<LocationDto, 'id'> }) =>
       request<StopDto>(`/api/routes/${routeId}/stops`, {
         method: 'POST',
         body: JSON.stringify(data),
