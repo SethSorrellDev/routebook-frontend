@@ -105,10 +105,11 @@ export const api = {
   },
 
   knowledgeEntries: {
-    getFiltered: (params?: { routeId?: number; stopId?: number }) => {
+    getFiltered: (params?: { routeId?: number; stopId?: number; q?: string }) => {
       const query = new URLSearchParams();
       if (params?.routeId != null) query.set('routeId', String(params.routeId));
       if (params?.stopId != null) query.set('stopId', String(params.stopId));
+      if (params?.q) query.set('q', params.q);
       const qs = query.toString();
       return request<KnowledgeEntryDto[]>(`/api/knowledge-entries${qs ? `?${qs}` : ''}`);
     },
