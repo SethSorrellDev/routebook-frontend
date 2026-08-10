@@ -83,6 +83,9 @@ export const api = {
     getById: (id: number) => request<RouteDto>(`/api/routes/${id}`),
     create: (data: Omit<RouteDto, 'id'>) =>
       request<RouteDto>('/api/routes', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: number, data: Omit<RouteDto, 'id'>) =>
+      request<RouteDto>(`/api/routes/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: number) => request<void>(`/api/routes/${id}`, { method: 'DELETE' }),
   },
 
   stops: {
@@ -92,6 +95,10 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    getById: (id: number) => request<StopDto>(`/api/stops/${id}`),
+    update: (id: number, data: Omit<StopDto, 'id'>) =>
+      request<StopDto>(`/api/stops/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: number) => request<void>(`/api/stops/${id}`, { method: 'DELETE' }),
   },
 
   knowledgeEntries: {
@@ -108,6 +115,9 @@ export const api = {
         method: 'POST',
         body: JSON.stringify(data),
       }),
+    update: (id: number, data: Omit<KnowledgeEntryDto, 'id'>) =>
+      request<KnowledgeEntryDto>(`/api/knowledge-entries/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: number) => request<void>(`/api/knowledge-entries/${id}`, { method: 'DELETE' }),
   },
 
   attachments: {
