@@ -1,5 +1,7 @@
 # RouteBook Frontend
 
+![CI](https://github.com/SethSorrellDev/routebook-frontend/actions/workflows/ci.yml/badge.svg)
+
 **Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com - both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity)
 
 The React frontend for RouteBook — a route-knowledge management tool for Cintas SSR routes. Talks to the [RouteBook backend](../RouteBook) (Spring Boot REST API).
