@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/SethSorrellDev/routebook-frontend/actions/workflows/ci.yml/badge.svg)
 
-**Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com - both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity)
+**Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com — both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity)
 
 The React frontend for RouteBook — a route-knowledge management tool for Cintas SSR routes. Talks to the [RouteBook backend](../RouteBook) (Spring Boot REST API).
 
@@ -12,6 +12,7 @@ The React frontend for RouteBook — a route-knowledge management tool for Cinta
 - Vite (build tool, dev server with API proxy)
 - Tailwind CSS v4
 - React Router v7
+- Vitest + React Testing Library
 
 ## Design direction
 
@@ -20,15 +21,20 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 ## Core features
 
 - **Route-first browsing** — route list → route detail (stops + route-wide notes) → stop detail (stop-specific notes) → knowledge entry detail (with attachments)
-- **Search** — a persistent header search box filtering across all knowledge entries by title/body text
-- **Create/edit forms** — new routes (with inline new-driver creation), new stops (creates the underlying Location and Stop in one submit), and new knowledge entries at both the route and stop level
+- **Real server-side search** — the header search box queries the backend's database directly (not a client-side filter), matching title/body text case-insensitively
+- **Full create/edit/delete** — for routes, stops, and knowledge entries, all gated behind login. New stops create their underlying Location in the same atomic backend call, so a failure partway through never leaves orphaned data.
 - **File attachments** — upload/view/delete files on any knowledge entry, backed by Cloudflare R2 via the backend
+- **Authentication** — public read access for anyone browsing; a login control gates every write action behind admin credentials, verified against the backend rather than assumed correct
 
 ## Documentation
 
-- [SETUP.md](SETUP.md) — running the dev server, connecting to the backend
+- [SETUP.md](SETUP.md) — running the dev server, testing, connecting to the backend
 - [ARCHITECTURE.md](ARCHITECTURE.md) — component structure, API client, design system
 - [USER_GUIDE.md](USER_GUIDE.md) — walkthrough for end users (SSRs)
+
+## Testing
+
+24 tests via Vitest + React Testing Library, running in CI on every push. See [SETUP.md](SETUP.md#testing) for details.
 
 ## Project status
 
@@ -36,4 +42,9 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 |---|---|---|
 | 5 | Scaffold, routing, API client, all core read pages | Done |
 | 6 | Create/edit forms | Done |
-| 7 | Documentation, GitHub publish | In progress |
+| 7 | Documentation, CI, deployment, authentication, full edit/delete, real search, frontend test suite | Done |
+
+## Known limitations
+
+- Single admin account (no multi-user management) — an intentional design choice for a tool with one operator, not a gap
+- Free-tier hosting means occasional cold starts and a 30-day expiry clock on the backend's database that needs periodic attention
