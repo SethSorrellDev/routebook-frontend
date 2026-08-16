@@ -4,11 +4,11 @@
 
 **Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com — both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity)
 
-The React frontend for RouteBook — a route-knowledge management tool for Cintas SSR routes. Talks to the [RouteBook backend](../RouteBook) (Spring Boot REST API).
+The React frontend for RouteBook — a route-knowledge management tool for Cintas SSR routes. Talks to the [RouteBook backend](https://github.com/SethSorrellDev/RouteBook) (Spring Boot REST API).
 
 ## Tech stack
 
-- React 18 + TypeScript
+- React 19 + TypeScript
 - Vite (build tool, dev server with API proxy)
 - Tailwind CSS v4
 - React Router v7

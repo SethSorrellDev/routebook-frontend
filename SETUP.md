@@ -4,7 +4,7 @@
 
 - **Node.js**: 22.x (current LTS). Vite 6+ and Tailwind CSS v4 both require a reasonably current Node — check with `node --version`.
 - **npm**: bundled with Node (10.x confirmed working)
-- The [RouteBook backend](../RouteBook) running locally on port 8080 — this frontend has no standalone mode; every page fetches from the API
+- The [RouteBook backend](https://github.com/SethSorrellDev/RouteBook) running locally on port 8080 — this frontend has no standalone mode; every page fetches from the API
 
 ## Install
 
@@ -16,7 +16,7 @@ npm install
 
 ## Running the dev server
 
-First, make sure the backend is running (see [RouteBook/SETUP.md](../RouteBook/SETUP.md)) — it needs to be up on `http://localhost:8080` before the frontend can load any data.
+First, make sure the backend is running (see [RouteBook/SETUP.md](https://github.com/SethSorrellDev/RouteBook/blob/master/SETUP.md)) — it needs to be up on `http://localhost:8080` before the frontend can load any data.
 
 Then:
 
