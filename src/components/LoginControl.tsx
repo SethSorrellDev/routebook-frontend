@@ -38,14 +38,14 @@ export function LoginControl() {
 
   if (showForm) {
     return (
-      <div className="flex items-center gap-2">
-        <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-wrap items-center justify-end gap-1.5">
           <input
             type="text"
             value={inputUsername}
             onChange={(e) => setInputUsername(e.target.value)}
             placeholder="Username"
-            className="w-28 rounded border border-white/30 bg-white/10 px-2 py-1 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/50"
+            className="w-24 rounded border border-white/30 bg-white/10 px-2 py-1 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/50 sm:w-28"
             autoFocus
           />
           <input
@@ -53,7 +53,7 @@ export function LoginControl() {
             value={inputPassword}
             onChange={(e) => setInputPassword(e.target.value)}
             placeholder="Password"
-            className="w-28 rounded border border-white/30 bg-white/10 px-2 py-1 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/50"
+            className="w-24 rounded border border-white/30 bg-white/10 px-2 py-1 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/50 sm:w-28"
           />
           <button
             type="submit"
@@ -73,7 +73,7 @@ export function LoginControl() {
             Cancel
           </button>
         </form>
-        {error && <span className="text-xs text-orange-200">{error}</span>}
+        {error && <span className="w-full text-right text-xs text-orange-200">{error}</span>}
       </div>
     );
   }
