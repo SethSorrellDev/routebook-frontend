@@ -251,12 +251,17 @@ export function KnowledgeEntryDetailPage() {
             {attachments.map((att) => (
               <li
                 key={att.id}
-                className="flex items-center justify-between rounded-md border border-[var(--border)] bg-white px-4 py-2"
+                className="flex items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-white px-4 py-2"
               >
-                <a href={att.downloadUrl} target="_blank" rel="noreferrer" className="text-sm text-[var(--navy)] hover:underline">
+                
+                  href={att.downloadUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="min-w-0 flex-1 truncate text-sm text-[var(--navy)] hover:underline"
+                >
                   {att.fileName}
                 </a>
-                <div className="flex items-center gap-3">
+                <div className="flex shrink-0 items-center gap-3">
                   <span className="font-mono text-xs text-[var(--ink-muted)]">
                     {formatFileSize(att.fileSizeBytes)}
                   </span>

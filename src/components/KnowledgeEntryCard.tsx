@@ -17,10 +17,10 @@ export function KnowledgeEntryCard({ entry }: { entry: KnowledgeEntryDto }) {
     >
       <div className="w-2 shrink-0" style={{ backgroundColor: style.tab }} />
       <div className="flex-1 p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-[var(--ink)]">{entry.title}</h3>
+        <div className="mb-2 flex items-start justify-between gap-2">
+          <h3 className="min-w-0 flex-1 text-base font-semibold text-[var(--ink)]">{entry.title}</h3>
           <span
-            className="rounded px-2 py-0.5 text-xs font-mono uppercase tracking-wide"
+            className="shrink-0 rounded px-2 py-0.5 text-xs font-mono uppercase tracking-wide"
             style={{ backgroundColor: style.badgeBg, color: style.badgeText }}
           >
             {style.label}

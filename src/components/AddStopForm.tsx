@@ -89,7 +89,7 @@ export function AddStopForm({
           required
         />
       </div>
-      <div className="mb-4 grid grid-cols-3 gap-2">
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-2">
         <div>
           <label className={labelClass}>City</label>
           <input className={inputClass} value={city} onChange={(e) => setCity(e.target.value)} required />

@@ -156,7 +156,7 @@ export function RouteDetailPage() {
           </div>
         </form>
       ) : (
-        <div className="mb-6 flex items-start justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-3xl">{route.name}</h1>
             {route.description && (
