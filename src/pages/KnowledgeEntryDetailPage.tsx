@@ -254,6 +254,7 @@ export function KnowledgeEntryDetailPage() {
                 className="flex items-center justify-between gap-3 rounded-md border border-[var(--border)] bg-white px-4 py-2"
               >
                 
+                <a
                   href={att.downloadUrl}
                   target="_blank"
                   rel="noreferrer"
