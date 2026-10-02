@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { api, ApiError } from './client';
-import { setCredentials, clearCredentials } from './auth';
+import { login, clearCredentials, getAccessToken, isLoggedIn, AUTH_EXPIRED_EVENT } from './auth';
 
 function mockFetchOnce(body: unknown, options: { ok?: boolean; status?: number } = {}) {
   const { ok = true, status = 200 } = options;
@@ -11,6 +11,29 @@ function mockFetchOnce(body: unknown, options: { ok?: boolean; status?: number }
   } as Response;
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockResponse));
   return fetch as unknown as ReturnType<typeof vi.fn>;
+}
+
+/** Each call to fetch returns the next response in order. */
+function mockFetchSequence(...responses: Array<{ ok: boolean; status: number; body: unknown }>) {
+  const fetchMock = vi.fn();
+  for (const r of responses) {
+    fetchMock.mockResolvedValueOnce({ ok: r.ok, status: r.status, json: () => Promise.resolve(r.body) } as Response);
+  }
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+const unauthorized = {
+  ok: false,
+  status: 401,
+  body: { status: 401, message: 'Authentication required for this operation', timestamp: 'x', fieldErrors: null },
+};
+
+/** Logs in through the real auth module so tests don't depend on storage key names. */
+async function signIn(accessToken = 'access-1', refreshToken = 'refresh-1') {
+  mockFetchOnce({ accessToken, refreshToken, tokenType: 'Bearer', expiresIn: 900 });
+  await login('admin@example.com', 'pw');
+  vi.unstubAllGlobals();
 }
 
 describe('api client', () => {
@@ -33,12 +56,55 @@ describe('api client', () => {
     expect(options.headers['Authorization']).toBeUndefined();
   });
 
-  it('attaches the Authorization header when credentials are set', async () => {
-    setCredentials('admin', 'secret123');
+  it('attaches a Bearer token when signed in', async () => {
+    await signIn('access-1');
     const fetchMock = mockFetchOnce([]);
     await api.drivers.getAll();
     const [, options] = fetchMock.mock.calls[0];
-    expect(options.headers['Authorization']).toBe(`Basic ${btoa('admin:secret123')}`);
+    expect(options.headers['Authorization']).toBe('Bearer access-1');
+  });
+
+  it('refreshes once on a 401 and retries with the new token', async () => {
+    await signIn('expired-access', 'refresh-1');
+    const fetchMock = mockFetchSequence(
+      unauthorized,
+      { ok: true, status: 200, body: { accessToken: 'access-2', refreshToken: 'refresh-2', tokenType: 'Bearer', expiresIn: 900 } },
+      { ok: true, status: 200, body: [] }
+    );
+
+    const result = await api.drivers.getAll();
+
+    expect(result).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(3); // original, refresh, retry
+    expect(fetchMock.mock.calls[1][0]).toContain('/auth/token/refresh');
+    expect(fetchMock.mock.calls[2][1].headers['Authorization']).toBe('Bearer access-2');
+    expect(getAccessToken()).toBe('access-2');
+  });
+
+  it('drops the session, announces it, and retries anonymously when refresh fails', async () => {
+    await signIn('expired-access', 'expired-refresh');
+    const expired = vi.fn();
+    window.addEventListener(AUTH_EXPIRED_EVENT, expired);
+
+    const fetchMock = mockFetchSequence(
+      unauthorized,
+      { ok: false, status: 400, body: { timestamp: 'x', error: 'Token expired' } },
+      { ok: true, status: 200, body: [] }
+    );
+
+    const result = await api.drivers.getAll();
+    window.removeEventListener(AUTH_EXPIRED_EVENT, expired);
+
+    expect(result).toEqual([]); // public read still works
+    expect(isLoggedIn()).toBe(false);
+    expect(expired).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[2][1].headers['Authorization']).toBeUndefined();
+  });
+
+  it('does not try to refresh when there is no session', async () => {
+    const fetchMock = mockFetchSequence(unauthorized);
+    await expect(api.drivers.getAll()).rejects.toMatchObject({ status: 401 });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('throws an ApiError with the backend\'s status/message/fieldErrors on a non-2xx response', async () => {

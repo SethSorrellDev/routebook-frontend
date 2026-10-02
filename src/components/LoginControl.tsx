@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 export function LoginControl() {
   const { loggedIn, username, login, logout } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [inputUsername, setInputUsername] = useState('');
+  const [inputEmail, setInputEmail] = useState('');
   const [inputPassword, setInputPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
@@ -12,7 +12,7 @@ export function LoginControl() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setVerifying(true);
-    const result = await login(inputUsername, inputPassword);
+    const result = await login(inputEmail, inputPassword);
     setVerifying(false);
 
     if (result) {
@@ -20,7 +20,7 @@ export function LoginControl() {
     } else {
       setError(null);
       setShowForm(false);
-      setInputUsername('');
+      setInputEmail('');
       setInputPassword('');
     }
   }
@@ -41,10 +41,10 @@ export function LoginControl() {
       <div className="flex flex-wrap items-center justify-end gap-2">
         <form onSubmit={handleSubmit} className="flex flex-wrap items-center justify-end gap-1.5">
           <input
-            type="text"
-            value={inputUsername}
-            onChange={(e) => setInputUsername(e.target.value)}
-            placeholder="Username"
+            type="email"
+            value={inputEmail}
+            onChange={(e) => setInputEmail(e.target.value)}
+            placeholder="Email"
             className="w-24 rounded border border-white/30 bg-white/10 px-2 py-1 text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-white/50 sm:w-28"
             autoFocus
           />
