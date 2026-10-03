@@ -7,7 +7,7 @@ import type {
   LocationDto,
   ErrorResponse,
 } from '../types';
-import { getAuthHeader } from './auth';
+import { getAccessToken, getRefreshToken, refreshTokens, clearCredentials, AUTH_EXPIRED_EVENT } from './auth';
 
 /**
  * Thrown for any non-2xx response. Carries the backend's ErrorResponse
@@ -31,19 +31,30 @@ export class ApiError extends Error {
 // go through Vite's dev-server proxy to localhost:8080 (see vite.config.ts).
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const authHeader = getAuthHeader();
-  const baseHeaders: Record<string, string> = options?.body instanceof FormData
+function send(path: string, options: RequestInit | undefined, token: string | null): Promise<Response> {
+  const headers: Record<string, string> = options?.body instanceof FormData
     ? {}
     : { 'Content-Type': 'application/json' };
-  if (authHeader) {
-    baseHeaders['Authorization'] = authHeader;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
+  return fetch(`${API_BASE}${path}`, { headers, ...options });
+}
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: baseHeaders,
-    ...options,
-  });
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  let response = await send(path, options, getAccessToken());
+
+  // Access tokens last 15 minutes. An expired token is rejected with 401 even
+  // on public GETs, so try one shared refresh and retry. If the session can't
+  // be refreshed, drop it and retry anonymously so public pages keep working.
+  if (response.status === 401 && getRefreshToken()) {
+    const refreshed = await refreshTokens();
+    if (!refreshed) {
+      clearCredentials();
+      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+    }
+    response = await send(path, options, refreshed ? getAccessToken() : null);
+  }
 
   if (!response.ok) {
     // Every error from the backend follows the ErrorResponse shape
