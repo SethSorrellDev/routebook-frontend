@@ -26,7 +26,7 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 - **Real server-side search** — the header search box queries the backend's database directly (not a client-side filter), matching title/body text case-insensitively
 - **Full create/edit/delete** — for routes, stops, and knowledge entries, all gated behind login. New stops create their underlying Location in the same atomic backend call, so a failure partway through never leaves orphaned data.
 - **File attachments** — upload/view/delete files on any knowledge entry, backed by Cloudflare R2 via the backend
-- **Authentication** — public read access for anyone browsing; a login control gates every write action behind admin credentials, verified against the backend rather than assumed correct
+- **Authentication** — public read access for anyone browsing; writes require signing in with an account from the shared identity service. The app signs in against that service directly (set `VITE_IDENTITY_URL` at build time; locally it defaults to `http://localhost:8081`), keeps the tokens in `sessionStorage`, and signs the user out when the session can no longer be refreshed. The backend decides who is allowed to write. The identity service sleeps when idle, so the first sign-in after a quiet period can take a minute.
 
 ## Documentation
 
