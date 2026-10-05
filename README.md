@@ -2,7 +2,9 @@
 
 ![CI](https://github.com/SethSorrellDev/routebook-frontend/actions/workflows/ci.yml/badge.svg)
 
-**Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com — both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity)
+**Live app**: https://routebook-frontend.onrender.com (talks to the live backend at https://routebook-da3w.onrender.com — both on Render's free tier, so expect a 30-60 second wake-up delay after 15 minutes of inactivity). The shared identity service that handles sign-in runs on an always-on paid instance, so sign-in itself never waits on a cold start.
+
+**Demo access:** available on request. Browsing needs no sign-in at all; the demo sign-in can read but not edit.
 
 ![RouteBook route edit form](docs/screenshots/route-edit-form.png)
 
@@ -26,7 +28,7 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 - **Real server-side search** — the header search box queries the backend's database directly (not a client-side filter), matching title/body text case-insensitively
 - **Full create/edit/delete** — for routes, stops, and knowledge entries, all gated behind login. New stops create their underlying Location in the same atomic backend call, so a failure partway through never leaves orphaned data.
 - **File attachments** — upload/view/delete files on any knowledge entry, backed by Cloudflare R2 via the backend
-- **Authentication** — public read access for anyone browsing; writes require signing in with an account from the shared identity service. The app signs in against that service directly (set `VITE_IDENTITY_URL` at build time; locally it defaults to `http://localhost:8081`), keeps the tokens in `sessionStorage`, and signs the user out when the session can no longer be refreshed. The backend decides who is allowed to write. The identity service sleeps when idle, so the first sign-in after a quiet period can take a minute.
+- **Authentication** — public read access for anyone browsing; writes require signing in with an account from the shared identity service. The app signs in against that service directly (set `VITE_IDENTITY_URL` at build time; locally it defaults to `http://localhost:8081`), keeps the tokens in `sessionStorage`, and signs the user out when the session can no longer be refreshed. The backend decides who is allowed to write. The identity service runs on an always-on paid instance, so sign-in doesn't wait on a cold start.
 
 ## Documentation
 
@@ -36,7 +38,7 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 
 ## Testing
 
-24 tests via Vitest + React Testing Library, running in CI on every push. See [SETUP.md](SETUP.md#testing) for details.
+32 tests via Vitest + React Testing Library, running in CI on every push. See [SETUP.md](SETUP.md#testing) for details.
 
 ## Project status
 
@@ -48,5 +50,5 @@ Built as a "field binder, digitized" — not a generic SaaS dashboard. Warm pape
 
 ## Known limitations
 
-- Single admin account (no multi-user management) — an intentional design choice for a tool with one operator, not a gap
-- Free-tier hosting means occasional cold starts and a 30-day expiry clock on the backend's database that needs periodic attention
+- Writers are a short allowlist managed in the backend's configuration (`ADMIN_SUBJECTS`), with no in-app user management — an intentional design choice for a tool with one operator, not a gap
+- Free-tier hosting means occasional cold starts and the backend's free Postgres database expires on a fixed schedule and has to be renewed
